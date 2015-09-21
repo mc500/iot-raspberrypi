@@ -1,7 +1,6 @@
 {
   "dependencies": {
-    "fs": "0.0.2",
-    "node-syslog": "~1.2.0"
+    "fs": "0.0.2"
   },
   "name": "IoT-Raspberry-Pi",
   "version": "0.0.0",

@@ -14,11 +14,14 @@
  * IBM IoT Starter Main 
  */
 
-var fs = require('fs'),
-	syslog = require('node-syslog');
+var PI = Math.PI,
+	MIN_VALUE = -1.0,
+    MAX_VALUE = 1.0;
 
-syslog.init("iot", syslog.LOG_PID | syslog.LOG_CONS, syslog.LOG_USER);
+var configFile = '/etc/iotsample-raspberrypi/device.cfg',
+	publishTopic = 'iot-2/evt/status/fmt/json',
+	subscribeTopic = 'iot-2/cmd/reboot/fmt/json';
 
-syslog.log(syslog.LOG_INFO, "**** IoT Raspberry Pi Sample has started ****");
+var fs = require('fs');
 
-syslog.close();
+console.info('**** IoT Raspberry Pi Sample has started ****');
