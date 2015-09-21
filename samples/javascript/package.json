@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "fs": "0.0.2",
+    "node-syslog": "~1.2.0"
+  },
+  "name": "IoT-Raspberry-Pi",
+  "version": "0.0.0",
+  "description": "IBM IoT Starter for Raspberry-Pi with Node.js",
+  "main": "iotmain.js",
+  "devDependencies": {
+    "mocha": "~2.3.2",
+    "mocha-jshint": "~2.2.3",
+    "chai": "~3.2.0"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha"
+  },
+  "author": "JeongSeok Hong",
+  "license": ""
+}
