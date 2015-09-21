@@ -26,6 +26,7 @@ var configFile = '/etc/iotsample-raspberrypi/device.cfg',
 var fs = require('fs'),
 	properties = require('properties'),
 	mqtt = require('mqtt'),
+	cpustat = require('./cpustat'),
 	IoT = require('./ibm-iot');
 
 console.info('**** IoT Raspberry Pi Sample has started ****');
@@ -93,12 +94,32 @@ get_config(configFile, function(config) {
 		}
 
 		// Connect to server
-		console.log('msproxyUrl: ' + msproxyUrl);
-		console.log('clientId: ' + clientId);
 		var client = mqtt.connect(msproxyUrl, options);
 
 		client.on('connect', function() {
 			console.log('CONNECT');
+
+			//subscribe for commands - only on registered mode
+			if (isRegistered) {
+				client.subscribe(subscribeTopic);
+			}
+
+			// count for the sine wave
+			var count = 1;
+			var sleepTimeout = IoT.EVENTS_INTERVAL;
+
+			// Repeat
+			setInterval(function() {				
+				client.publish(publishTopic, JSON.stringify({
+					'd': { 
+						'myName': IoT.DEVICE_NAME,
+						'cputemp': cpustat.getCPUTemp(), 
+						'cpuload': cpustat.getCPULoad(),
+						'sine': sineVal(MIN_VALUE, MAX_VALUE, 16, count)
+					}
+				}));
+
+			}, 1000); // run it every 1 second
 		});
 
 		client.on('message', function(topic, message) {
@@ -112,12 +133,8 @@ get_config(configFile, function(config) {
 		})
 
 		// resetting the counters
-		connDelayTimeout = 1;
-		retryAttempt = 0;
-
-		// count for the sine wave
-		var count = 1;
-		var sleepTimeout = IoT.EVENTS_INTERVAL;
+		// connDelayTimeout = 1;
+		// retryAttempt = 0;
 
 	});
 
@@ -142,6 +159,12 @@ function getClientId(config, mac_address) {
 
 	return 'd:' + orgId + ':' + typeId + ':' + deviceId;
 	// return TENANT_PREFIX + ':' + mac_address;
+}
+
+function sineVal(minValue, maxValue, duration, count) {
+	var sineValue = Math.sin(2.0 * Math.PI * count / duration) * (maxValue - minValue) / 2.0;
+	console.log('sineValue: ' + sineValue);
+	return sineValue;
 }
 
 // This is the function to read the config from the device.cfg file

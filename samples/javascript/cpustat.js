@@ -20,6 +20,11 @@ var fs = require('fs'),
 	cpuloadloc = '/proc/loadavg';
 
 function getCPUTemp() {
+	if (!fs.exists(cputemploc)) {
+		console.error('cputemploc file does not exist. returns 50');
+		return 10;
+	}
+
 	var data = fs.readFileSync(cputemploc, 'utf8'),
 		cputemp = data/1000;
 
@@ -27,6 +32,10 @@ function getCPUTemp() {
 }
 
 function getCPULoad() {
+	if (!fs.exists(cpuloadloc)) {
+		console.error('cpuloadloc file does not exist. returns 10');
+		return 10;
+	}
 	var data = fs.readFileSync(cpuloadloc, 'utf8').split(' '),
 		load = {
 			load1: data[0],
