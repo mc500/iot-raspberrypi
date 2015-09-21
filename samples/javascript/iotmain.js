@@ -20,7 +20,7 @@ var PI = Math.PI,
 
 var configFile = '/etc/iotsample-raspberrypi/device.cfg',
 	publishTopic = 'iot-2/evt/status/fmt/json',
-	subscribeTopic = 'iot-2/cmd/reboot/fmt/json'
+	subscribeTopic = 'iot-2/cmd/reboot/fmt/json',
 	certFile = './IotFoundation.pem';
 
 var fs = require('fs'),
@@ -34,13 +34,16 @@ console.info('**** IoT Raspberry Pi Sample has started ****');
 //read the config file, to decide whether to goto quickstart or registered mode of operation
 get_config(configFile, function(config) {
 
-	var isRegistered = config ? true : false;
+	var isRegistered = config ? true : false,
+		msproxyUrl,
+		username,
+		passwd;
 
 	if (isRegistered) {
 		console.log(JSON.stringify(config));
 		console.info('Running in Registered mode\n');
 
-		var msproxyUrl = 'ssl://' + config.org + '.messaging.internetofthings.ibmcloud.com:8883';
+		msproxyUrl = 'ssl://' + config.org + '.messaging.internetofthings.ibmcloud.com:8883';
 
 		if (config['auth-method'] !== 'token') {
 			console.error('Detected that auth-method is not token. Currently other authentication mechanisms are not supported, IoT process will exit.');
@@ -48,12 +51,12 @@ get_config(configFile, function(config) {
 			process.exit(1);
 			return;
 		} else {
-			var username = "use-token-auth";
-			var passwd = config['auth-token'];
+			username = "use-token-auth";
+			passwd = config['auth-token'];
 		}
 	} else {
 		console.info('Running in Quickstart mode\n');
-		var msproxyUrl = "tcp://quickstart.messaging.internetofthings.ibmcloud.com:1883";
+		msproxyUrl = "tcp://quickstart.messaging.internetofthings.ibmcloud.com:1883";
 	}
 
 	// read the events
@@ -77,20 +80,17 @@ get_config(configFile, function(config) {
 		var options = {
 			'clientId': clientId,
 			'reconnectPeriod': 3000, // default 1000ms
-		}
+		};
 
 		//only when in registered mode, set the username/passwd and enable TLS
 		if (isRegistered) {
-			console.log('username: ' + username);
-			console.log('password: ' + passwd);
-
-			options['username'] = username;
-			options['password'] = passwd;
+			options.username = username;
+			options.password = passwd;
 
 			// MQTT over TLS
 			//options['protocol'] = 'mqtts';
-			options['ca'] = [fs.readFileSync(certFile)];
-			options['rejectUnauthorized'] = false; // for Selfsigned Certificates
+			options.ca = [fs.readFileSync(certFile)];
+			options.rejectUnauthorized = false; // for Selfsigned Certificates
 		}
 
 		// Connect to server
@@ -127,10 +127,9 @@ get_config(configFile, function(config) {
 		});
 
 		client.on('error', function(error) {
-			console.error('ERROR');
 			console.error(error);
 			process.exit(1);
-		})
+		});
 
 		// resetting the counters
 		// connDelayTimeout = 1;
