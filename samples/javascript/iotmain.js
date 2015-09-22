@@ -89,8 +89,22 @@ get_config(configFile, function(config) {
 
 			// MQTT over TLS
 			//options['protocol'] = 'mqtts';
-			options.ca = [fs.readFileSync(certFile)];
-			options.rejectUnauthorized = false; // for Selfsigned Certificates
+
+			// Split certificates so that IoTFoundation.pem has multiple certificates
+			var certs = fs.readFileSync('IotFoundation.pem');
+			var caCerts = [];
+			var chains = certs.toString().split('-----END CERTIFICATE-----');
+
+			for (var idx in chains) {
+				var chain = chains[idx].trim();
+
+				if (chain !== '') {
+					caCerts.push(chain + '\n-----END CERTIFICATE-----');					
+				}
+			}
+
+			options.ca = caCerts;
+			options.rejectUnauthorized = true; // false for Selfsigned Certificates
 		}
 
 		// Connect to server
