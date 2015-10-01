@@ -11,5 +11,5 @@ See this [recipe](https://www.ibmdw.net/iot/recipes/raspberry-pi/) for running t
 
 Content
 =======
-There is a C sample that installs an 'iot' service, which you can use to connect to and interact with QuickStart or a registered organization in the Internet of Things Cloud. For more details, refer to the README in samples/c.
+There is a C & Node.js sample that installs an 'iot' service, which you can use to connect to and interact with QuickStart or a registered organization in the Internet of Things Cloud. For more details, refer to the README in samples/c and samples/javascript.
 
