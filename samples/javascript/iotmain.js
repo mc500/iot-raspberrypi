@@ -16,7 +16,7 @@
 
 var PI = Math.PI,
 	MIN_VALUE = -1.0,
-    MAX_VALUE = 1.0;
+	MAX_VALUE = 1.0;
 
 var configFile = '/etc/iotsample-raspberrypi/device.cfg',
 	publishTopic = 'iot-2/evt/status/fmt/json',
@@ -116,14 +116,16 @@ get_config(configFile, function(config) {
 			//subscribe for commands - only on registered mode
 			if (isRegistered) {
 				client.subscribe(subscribeTopic);
+			} else {
+				console.log('The device ID is ' + mac_address);
+				console.log('For Real-time visualization of the data, visit http://quickstart.internetofthings.ibmcloud.com/?deviceId=' + mac_address);
 			}
 
 			// count for the sine wave
 			var count = 1;
 			var sleepTimeout = IoT.EVENTS_INTERVAL;
 
-			// Repeat
-			setInterval(function() {				
+			var sendMessage = function() {
 				client.publish(publishTopic, JSON.stringify({
 					'd': { 
 						'myName': IoT.DEVICE_NAME,
@@ -132,8 +134,17 @@ get_config(configFile, function(config) {
 						'sine': sineVal(MIN_VALUE, MAX_VALUE, 16, count)
 					}
 				}));
+			},
+			startTimer = function(interval) {
+				setTimeout(function() {				
+					sendMessage();
+					count++;
+					startTimer(interval);
+				}, interval);
+			}
 
-			}, 1000); // run it every 1 second
+			// Repeat 
+			startTimer(1000); // run it every 1 second
 		});
 
 		client.on('message', function(topic, message) {
@@ -176,8 +187,8 @@ function getClientId(config, mac_address) {
 
 function sineVal(minValue, maxValue, duration, count) {
 	var sineValue = Math.sin(2.0 * Math.PI * count / duration) * (maxValue - minValue) / 2.0;
-	console.log('sineValue: ' + sineValue);
-	return sineValue;
+	//console.log('sineValue: ' + sineValue);
+	return sineValue.toFixed(2);
 }
 
 // This is the function to read the config from the device.cfg file
