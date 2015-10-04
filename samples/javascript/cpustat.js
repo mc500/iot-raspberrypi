@@ -20,28 +20,37 @@ var fs = require('fs'),
 	cpuloadloc = '/proc/loadavg';
 
 function getCPUTemp() {
-	if (!fs.statSync(cputemploc)) {
-		console.error('cputemploc file does not exist. returns 50');
-		return 10;
-	}
+	var cputemp;
+	try {
+		var stats = fs.statSync(cputemploc),
+			data = fs.readFileSync(cputemploc, 'utf8');
 
-	var data = fs.readFileSync(cputemploc, 'utf8'),
 		cputemp = data/1000;
+	} catch(e) {
+		cputemp = (Math.random()*100).toFixed(0);
+		console.error('cputemploc file does not exist. but returns ' + cputemp);
+	}
 
 	return cputemp;
 }
 
 function getCPULoad() {
-	if (!fs.statSync(cpuloadloc)) {
-		console.error('cpuloadloc file does not exist. returns 10');
-		return 10;
-	}
-	var data = fs.readFileSync(cpuloadloc, 'utf8').split(' '),
+
+	var load = {};
+
+	try {
+		var stats = fs.statSync(cpuloadloc),
+			data = fs.readFileSync(cpuloadloc, 'utf8').split(' ');
+
 		load = {
 			load1: data[0],
 			load5: data[1],
 			load15: data[2]
 		};
+	} catch(e) {
+		load.load1 = (Math.random()*100).toFixed(0);
+		console.error('cpuloadloc file does not exist. but returns ' + load.load1);
+	}
 
 	return load.load1;
 }
